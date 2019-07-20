@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Đua Xe</title>
+
+    <script src="Car.js"></script>
+    <script src="TrafficCone.js"></script>
+    <script src="fuel.js"></script>
+
+
+</head>
+<body>
+
+<img id="road1Id" src="image/road1.png" style="display: none">
+<img id="road2Id" src="image/road2.png" style="display: none">
+<img id="road3Id" src="image/road3.png" style="display: none">
+<img id='carId' src="image/car.png" style="display: none">
+<img id='coneId' src="image/trafficCone.png" style="display: none">
+<img id='endId' src="image/end.jpg" style="display: none">
+<img id='fuelId' src="image/fuel.png" style="display: none">
+<canvas id="canvasId" width="1000px" height="500" style="border: 1px solid black;"></canvas>
+
+</body>
+
+<script>
+
+
+    let canvas = document.getElementById('canvasId');
+    let midWidth = (canvas.width / 2) - 70;
+    let imgCar = document.getElementById('carId');
+    let imgCone = document.getElementById('coneId');
+    let imgFuel = document.getElementById('fuelId');
+    let endGame = document.getElementById('endId');
+
+    // Khai báo các biến
+    let car = new Car(imgCar, midWidth, 400, 10, false, false, 100, 100, 2000);
+    let ctx = canvas.getContext("2d");
+    ctx.font = '16px Arial';
+    ctx.fillStyle = "red";
+
+    let count = 1;
+    let j = 0;
+    let h = 0;
+    let level = 67;
+    let newSpeed = 3;
+    let miniSpeed = 0;
+    let mutilCone = [];
+    let mutilFuel = [];
+    let score = 0;
+
+
+    //Vẽ đường chuyển động:
+    function drawRoad() {
+        let img1 = document.getElementById('road1Id');
+        let img2 = document.getElementById('road2Id');
+        let img3 = document.getElementById('road3Id');
+
+
+        if (count < 10) {
+            ctx.drawImage(img1, 0, 0);
+        } else if (count < 20) {
+            ctx.drawImage(img2, 0, 0);
+        } else if (count < 30) {
+            ctx.drawImage(img3, 0, 0);
+        } else {
+            ctx.drawImage(img1, 0, 0);
+            count = 0;
+        }
+
+        count++;
+    }
+
+    drawRoad();
+    car.drawCar(canvas);
+
+    //Set true false move
+    document.addEventListener('keyup', function (event) {
+        if (event.keyCode == 37) {
+            car.isMoveLeft = false;
+        } else if (event.keyCode == 39) {
+            car.isMoveRight = false;
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode == 37) {
+            car.isMoveLeft = true;
+        } else if (event.keyCode == 39) {
+            car.isMoveRight = true;
+        }
+    });
+
+
+    //Tao 1 cone:
+    function createCone() {
+        let randomX = Math.round(Math.random() * 300) + 300;
+        let cone = new TrafficCone(imgCone, randomX, 5, newSpeed, 50, 50);
+        mutilCone.push(cone);
+    }
+
+    // Tao 1 fuel:
+    function createFuel() {
+        let randomX = Math.round(Math.random() * 300) + 300;
+        let fuel = new Fuel(imgFuel, randomX, 5, 3, 30, 30, 20);
+        mutilFuel.push(fuel);
+    }
+
+
+    //Move Road & Cone & Car
+    function move() {
+
+        clearCanvas();
+        drawRoad();
+
+//tang level:
+        if (j % level == 0) {
+            createCone();
+            h = Math.round(Math.random() * 20);
+
+            if (h % 11 == 0) {
+                createFuel();
+            }
+            if (level > 19) {
+                level--;
+                console.log('level: '+level);
+
+                if (miniSpeed < 1) {
+                    miniSpeed = miniSpeed + 0.1;
+                } else {
+                    miniSpeed = 0;
+                }
+
+                newSpeed = newSpeed + Math.floor(miniSpeed);
+                // console.log('miniSpeed: ' + miniSpeed);
+                // console.log('newSpeed: ' + newSpeed);
+
+            }
+
+        }
+        //car
+        car.moveRight();
+        car.moveLeft();
+        car.fuelBurn();
+        ctx.fillText("FUEL: " + car.getFuelLevel(), 10, 20);
+
+        //fuel:
+        for (let k = 0; k < mutilFuel.length; k++) {
+            mutilFuel[k].moveFuel();
+            mutilFuel[k].drawFuel(canvas);
+            car.plusFuel(mutilFuel[k]);
+        }
+
+        //cone
+        for (let i = 0; i < mutilCone.length; i++) {
+            mutilCone[i].setSpeed(newSpeed);
+            mutilCone[i].moveDown();
+            mutilCone[i].drawCone(canvas);
+            car.hitCar(mutilCone[i]);
+        }
+
+        car.drawCar(canvas);
+
+        j++;
+        showScore();
+        end();
+    }
+
+    //Đếm thời gian của road và Car!
+    let runGame = setInterval(move, 20);
+
+    //Show Score
+    function showScore() {
+        score = Math.round(j / 10);
+        ctx.fillText('SCORE: ' + score, 900, 20);
+    }
+
+    //EndGame
+    function end() {
+        if(car.hit == true){
+            ctx.drawImage(endGame, 0, 0);
+            ctx.fillText(' YOUR SCORE IS: ' + score, 410, 100);
+            clearInterval(runGame);
+
+        }
+    }
+
+    //Xóa canvas:
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+</script>
+</html>
