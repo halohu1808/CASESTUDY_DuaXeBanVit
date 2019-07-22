@@ -34,7 +34,7 @@ let Car = function (image, x, y, speed, isMoveLeft, isMoveRight, width, height, 
 
     }
     this.moveRight = function () {
-        if (this.x < 570 && this.isMoveRight == true) {
+        if (this.x < 630 && this.isMoveRight == true) {
             this.x = this.x + this.speed;
         }
     }
@@ -48,8 +48,9 @@ let Car = function (image, x, y, speed, isMoveLeft, isMoveRight, width, height, 
     }
 
     this.hitCar = function (TrafficCone) {
+        console.log('1111111111111');
         if (this.x < (TrafficCone.x + 20) && TrafficCone.x < this.x + (this.width - 30)) {
-            if (this.y < TrafficCone.y && TrafficCone.y < this.y + (this.width - 20)) {
+            if (this.y-30 < TrafficCone.y && TrafficCone.y < this.y + (this.height-50)) {
                 return this.hit = true;
             }
 

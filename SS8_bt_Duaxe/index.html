@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Đua Xe</title>
-    <script src="Car.js"></script>
-    <script src="TrafficCone.js"></script>
-    <script src="fuel.js"></script>
-    <script src="bird.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Hanalei&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Russo+One&display=swap" rel="stylesheet">
+
 
 </head>
+<style>
+    body{
+        font-family: 'Hanalei', cursive;
+    }
+</style>
 <body>
 
 <img id="road1Id" src="image/road1.jpg" style="display: none">
@@ -17,15 +21,22 @@
 <img id='carId' src="image/car.png" style="display: none">
 <img id='coneId' src="image/trafficCone.png" style="display: none">
 <img id='endId' src="image/endgame.jpg" style="display: none">
+<img id='endFuelId' src="image/endgame1.jpg" style="display: none">
 <img id='fuelId' src="image/fuel.png" style="display: none">
 <img id='bangId' src="image/bang.png" style="display: none">
 <img id='bird1Id' src="image/bird1.png" onclick="shootBird()" style="display: none">
+<img id='bird2Id' src="image/bird2.png" onclick="shootBird()" style="display: none">
+<img id='bird3Id' src="image/bird3.png" onclick="shootBird()" style="display: none">
 
 <canvas id="canvasId" onclick="showCoords(event)" width="1000px" height="630px" style="border: 1px solid black;"></canvas>
 
-
+<script src="Car.js"></script>
+<script src="TrafficCone.js"></script>
+<script src="fuel.js"></script>
+<script src="bird.js"></script>
+<script src="start.js"></script>
 </body>
 
-<script src="start.js"></script>
+
 
 </html>

@@ -1,4 +1,4 @@
-let Fuel = function ( image, x,y,speed,width,height,fuel) {
+let Fuel = function (image, x,y,speed,width,height,fuel) {
 
     this.image = image;
     this.x = x;
