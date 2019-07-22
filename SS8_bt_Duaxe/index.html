@@ -7,6 +7,7 @@
     <script src="Car.js"></script>
     <script src="TrafficCone.js"></script>
     <script src="fuel.js"></script>
+    <script src="bird.js"></script>
 
 
 </head>
@@ -19,7 +20,10 @@
 <img id='coneId' src="image/trafficCone.png" style="display: none">
 <img id='endId' src="image/end.jpg" style="display: none">
 <img id='fuelId' src="image/fuel.png" style="display: none">
-<canvas id="canvasId" width="1000px" height="500" style="border: 1px solid black;"></canvas>
+<img id='bangId' src="image/bang.png" style="display: none">
+<img id='bird1Id' src="image/bird1.png" onclick="shootBird()" style="display: none">
+
+<canvas id="canvasId" onclick="showCoords(event)" width="1000px" height="500" style="border: 1px solid black;"></canvas>
 
 </body>
 
@@ -28,10 +32,14 @@
 
     let canvas = document.getElementById('canvasId');
     let midWidth = (canvas.width / 2) - 70;
+    //tạo ảnh để vẽ!
     let imgCar = document.getElementById('carId');
     let imgCone = document.getElementById('coneId');
     let imgFuel = document.getElementById('fuelId');
+    let imgBang = document.getElementById('bangId');
+    let imgBird1 = document.getElementById('bird1Id');
     let endGame = document.getElementById('endId');
+
 
     // Khai báo các biến
     let car = new Car(imgCar, midWidth, 400, 10, false, false, 100, 100, 2000);
@@ -42,12 +50,15 @@
     let count = 1;
     let j = 0;
     let h = 0;
+    let shootBirdIndex = 0;
     let level = 67;
     let newSpeed = 3;
     let miniSpeed = 0;
     let mutilCone = [];
     let mutilFuel = [];
+    let mutilBird = [];
     let score = 0;
+    let sumScore =0;
 
 
     //Vẽ đường chuyển động:
@@ -55,7 +66,6 @@
         let img1 = document.getElementById('road1Id');
         let img2 = document.getElementById('road2Id');
         let img3 = document.getElementById('road3Id');
-
 
         if (count < 10) {
             ctx.drawImage(img1, 0, 0);
@@ -69,7 +79,7 @@
         }
 
         count++;
-    }
+    }// Đây là đoạn cần cải tiến!!!! vẽ thế này quá mất công, nên cho vào 1 mảng và từ lần sau gọi mảng ra (tạo ảnh git bằng mảng)
 
     drawRoad();
     car.drawCar(canvas);
@@ -106,6 +116,13 @@
         mutilFuel.push(fuel);
     }
 
+    //tạo 1 Bird:
+    function createBird() {
+        let randomY = Math.round(Math.random() * 400) + 50;
+        let bird = new Bird(imgBird1, imgBang, 0, randomY, 5, 50, 50, 100);
+        mutilBird.push(bird);
+    }
+
 
     //Move Road & Cone & Car
     function move() {
@@ -116,14 +133,20 @@
 //tang level:
         if (j % level == 0) {
             createCone();
-            h = Math.round(Math.random() * 20);
+            h = Math.round(Math.random() * 30);
+            let birdRandom = Math.round(Math.random() * 10);
 
-            if (h % 11 == 0) {
+            if (h % 21 == 0) {
                 createFuel();
+                console.log('Fuel Out');
+            }
+            if (birdRandom % 5 == 0) {
+                createBird();
+                console.log('Bird Out');
             }
             if (level > 19) {
                 level--;
-                console.log('level: '+level);
+                console.log('level: ' + level);
 
                 if (miniSpeed < 1) {
                     miniSpeed = miniSpeed + 0.1;
@@ -148,7 +171,10 @@
         for (let k = 0; k < mutilFuel.length; k++) {
             mutilFuel[k].moveFuel();
             mutilFuel[k].drawFuel(canvas);
-            car.plusFuel(mutilFuel[k]);
+            if (car.fuel < 2001) {
+                car.plusFuel(mutilFuel[k]);
+            }
+
         }
 
         //cone
@@ -156,8 +182,17 @@
             mutilCone[i].setSpeed(newSpeed);
             mutilCone[i].moveDown();
             mutilCone[i].drawCone(canvas);
-            car.hitCar(mutilCone[i]);
+            //car.hitCar(mutilCone[i]);
         }
+
+        //bird
+        for (let m = 0; m < mutilBird.length; m++) {
+            mutilBird[m].moveBird();
+            mutilBird[m].drawBird(canvas);
+            //console.log('toa do x: ' + mutilBird[m].x);
+            shootBirdIndex = m;
+        }
+
 
         car.drawCar(canvas);
 
@@ -167,17 +202,54 @@
     }
 
     //Đếm thời gian của road và Car!
-    let runGame = setInterval(move, 20);
+    let runGame = setInterval(move, 10);
 
     //Show Score
     function showScore() {
-        score = Math.round(j / 10);
-        ctx.fillText('SCORE: ' + score, 900, 20);
+        let score2 = Math.round(j / 10);
+        sumScore = score + score2;
+        ctx.fillText('SCORE: ' + sumScore, 900, 20);
+        console.log('sumScore: '+sumScore);
+        console.log('score2: '+score2);
+        console.log('score: '+score);
+        //score = 0;
     }
+
+    function showCoords(event) {
+        let x = event.clientX;
+        let y = event.clientY;
+        let coords = "X coords: " + x + ", Y coords: " + y;
+        console.log(coords);
+        let shootedIndex = shootBirdIndex;
+        console.log('shootedIndex: ' + shootedIndex);
+        console.log('mutilBird[shootedIndex].x: ' + mutilBird[shootedIndex].x)
+
+        if (x < (mutilBird[shootedIndex].x + 50) && mutilBird[shootedIndex].x < x) {
+            if (y < mutilBird[shootedIndex].y + 50 && mutilBird[shootedIndex].y < y) {
+                console.log('SHOOT!!!!!!')
+
+                mutilBird[shootedIndex].drawBangBird(canvas);
+                score += 100;
+
+            }
+
+        }
+
+    }
+
+
+    // //shoot bird
+    // function shootBird() {
+    //     console.log('SHOOT!!!!!!')
+    //     let shootedIndex = shootBirdIndex;
+    //     score += 100; // shoot plus score
+    //     ctx.fillText('SCORE: ' + score, 900, 20);
+    //     mutilBird[shootedIndex].drawBangBird(canvas);
+    // }
 
     //EndGame
     function end() {
-        if(car.hit == true){
+        if (car.hit == true) {
             ctx.drawImage(endGame, 0, 0);
             ctx.fillText(' YOUR SCORE IS: ' + score, 410, 100);
             clearInterval(runGame);

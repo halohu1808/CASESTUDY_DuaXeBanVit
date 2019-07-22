@@ -11,6 +11,7 @@ let Car = function (image, x, y, speed, isMoveLeft, isMoveRight, width, height, 
     this.fuel = fuel;
     this.image = image;
     this.hit = false;
+    this.shootBird = false;
 
 
     this.toaDoFunction = function (x, y) {
@@ -63,6 +64,7 @@ let Car = function (image, x, y, speed, isMoveLeft, isMoveRight, width, height, 
             }
         }
     }
+
 
     // vẽ canvas: tạo ra 1 bút contex. Tạo canvas.getContext('2d') Sau đó contex.drawimage
 
